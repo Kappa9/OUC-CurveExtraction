@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setPage(0);
     // 设置禁止最大化
-    Qt::WindowFlags flags = 0;
+    Qt::WindowFlags flags;
     flags |= Qt::WindowMinimizeButtonHint;
     flags |= Qt::WindowCloseButtonHint;
     setWindowFlags(flags);
