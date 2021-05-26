@@ -149,7 +149,7 @@ Mat GetCurve::ManualFix(Mat src, Point2i lu,Point2i lb,Point2i rb)
     return M;
 }
 
-vector<Point2f> GetCurve::AutoGetCurve(Mat gray) //图像校正后提取曲线的核心代码
+vector<Point2f> GetCurve::AutoGetCurve(Mat gray, bool isLinesptm) //图像校正后提取曲线的核心代码
 {
     Mat src = gray;
     //imshow("Input Image", src);

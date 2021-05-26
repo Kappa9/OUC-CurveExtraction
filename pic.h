@@ -43,6 +43,7 @@ public:
     bool autoSelect = false;
     bool manualSelect = false;
     bool pickColor = false;
+    bool lineptm = false;
     QColor curveColor = QColor(0, 0, 0);
     QPoint pickPoint;
     bool updateAxisF(QPointF p);

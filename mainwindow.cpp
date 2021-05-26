@@ -268,6 +268,11 @@ void MainWindow::on_coloredCurveCheckBox_stateChanged(int checked)
     }*/
 }
 
+void MainWindow::on_lineptmCheckBox_stateChanged(int checked)
+{
+    pic.extractPic.lineptm = checked;
+}
+
 void MainWindow::on_autoChooseRadioButton_toggled(bool checked)
 {
     pic.extractPic.autoSelect = checked;
@@ -282,7 +287,7 @@ void MainWindow::on_autoChooseRadioButton_toggled(bool checked)
     else {
         threshold = pic.currentAdjustedPic->mat;
     }
-    vector<Point2f> viewpoints = getCurve.AutoGetCurve(threshold);
+    vector<Point2f> viewpoints = getCurve.AutoGetCurve(threshold, pic.extractPic.lineptm);
     QList<QPointF> originalAxisList;
     QPointF relativeAxis;
     QPointF physicalAxis;
@@ -407,3 +412,4 @@ void MainWindow::on_outputButton_clicked()
     outp.close();
     qDebug()<<"Output succeed!";
 }
+

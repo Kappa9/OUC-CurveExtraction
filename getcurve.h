@@ -41,6 +41,6 @@ public:
     //使用接口
     Mat AutoFix(Mat src);
     Mat ManualFix(Mat src, Point2i lu,Point2i lb,Point2i rb);
-    vector<Point2f> AutoGetCurve(Mat gray);
+    vector<Point2f> AutoGetCurve(Mat gray, bool isLinesptm);
 };
 #endif // GETCURVE_H
