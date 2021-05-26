@@ -40,7 +40,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="picInputPage">
        <widget class="QGroupBox" name="picDisplayGBox">
@@ -518,7 +518,7 @@
               <x>14</x>
               <y>20</y>
               <width>281</width>
-              <height>271</height>
+              <height>290</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="checkBoxLayout">
@@ -615,6 +615,13 @@ border-color: rgb(170, 170, 170);
                </property>
                <property name="textFormat">
                 <enum>Qt::AutoText</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="lineptmCheckBox">
+               <property name="text">
+                <string>是否是线状谱</string>
                </property>
               </widget>
              </item>

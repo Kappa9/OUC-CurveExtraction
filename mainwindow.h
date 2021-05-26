@@ -51,7 +51,7 @@ private slots:
 
     void on_outputButton_clicked();
 
-    void on_coloredCurveCheckBox_stateChanged(int check);
+    void on_coloredCurveCheckBox_stateChanged(int checked);
 
     void on_autoChooseRadioButton_toggled(bool checked);
 
@@ -68,6 +68,8 @@ private slots:
     void on_redoButton_clicked();
 
     void on_resetButton_clicked();
+    void on_lineptmCheckBox_stateChanged(int checked);
+
 private:
     Ui::MainWindow *ui;
     Pic pic;
