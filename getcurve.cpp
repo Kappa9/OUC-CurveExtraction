@@ -152,17 +152,19 @@ Mat GetCurve::ManualFix(Mat src, Point2i lu,Point2i lb,Point2i rb)
 vector<Point2f> GetCurve::AutoGetCurve(Mat gray, bool isLinesptm) //图像校正后提取曲线的核心代码
 {
     Mat src = gray;
-    //imshow("Input Image", src);
     Mat dst;
     Point2i linepointU, linepointD;
 
     int PoiNumInacol, startrow;
     int stepsize;//设置步长
-    int linewidth=0;
+    int linewidth = 0;
     int col = src.cols;
     int row = src.rows;
 
-    vector<Point2f> rawDate;
+    vector<Point2f> rawDate;//存放线上点数据
+    float midPos1, midPos2;//存放中点数据
+    vector<Point2f> diff;//存放差分数据
+
     bool arvCurve = false;
     bool getLeft = false;
     int leftStart = 1; int pointScaned = 0;
@@ -187,6 +189,7 @@ vector<Point2f> GetCurve::AutoGetCurve(Mat gray, bool isLinesptm) //图像校正
                 getLeft = 1;
                 rawDate.push_back(Point2f(leftStart, (PoiNumInacol + float(linewidth) / 2)));
                 startrow = PoiNumInacol + (j - PoiNumInacol) / 2;
+                midPos1=startrow;
                 //cout << "啊这" << endl;
             }
         }
@@ -201,7 +204,7 @@ vector<Point2f> GetCurve::AutoGetCurve(Mat gray, bool isLinesptm) //图像校正
         }
         int k = 0; int l = 0;
         GetPoints = 0;
-        while ((!GetPoints) && (pointScaned <col/3))
+        while ((!GetPoints) && (pointScaned <col))
         {
             if ((arvCurve == 0) && ((src.at<uchar>(startrow + k, i) == 255) || (src.at<uchar>(startrow - l, i) == 255)))//搜索起始点，起始点下k/上l点是否在线上
             {
@@ -224,6 +227,7 @@ vector<Point2f> GetCurve::AutoGetCurve(Mat gray, bool isLinesptm) //图像校正
                 //cout << "到底下了" << endl;
                 outCurve1 = 1;
             }
+
             else if (outCurve1 == 0)
             {
                 k += 1;
@@ -254,7 +258,23 @@ vector<Point2f> GetCurve::AutoGetCurve(Mat gray, bool isLinesptm) //图像校正
                 arvCurve = 0; outCurve1 = 0; outCurve2 = 0; k = l = 0;
                 GetPoints = 1;
                 startrow = linepointU.y;
-                rawDate.push_back(Point2f(i, linepointU.y));
+
+                midPos2=(linepointD.y + linepointU.y)/2;
+                if (isLinesptm&&( midPos2 < midPos1))
+                {
+                    rawDate.push_back(Point2f(i, linepointU.y));
+                    midPos1 = midPos2;
+                }
+                if (isLinesptm && (midPos2 > midPos1))
+                {
+                    rawDate.push_back(Point2f(i, linepointD.y));
+                    midPos1 = midPos2;
+                }
+                if (!isLinesptm)
+                {
+                    rawDate.push_back(Point2f(i, linepointU.y));
+                }
+
                 break;
             }
 
@@ -263,11 +283,19 @@ vector<Point2f> GetCurve::AutoGetCurve(Mat gray, bool isLinesptm) //图像校正
         pointScaned = 0; k = l = 0;
     }
 
+    if (isLinesptm)
+    {
+        return rawDate;
+    }
     float min = 100; float temp; int id = 0;
+
+    diff.push_back(Point2f(rawDate[0].x, 0));//给第一个位置的差分赋0值
     for (int i = 0; i < rawDate.size()-1; i++)//寻找差分最小处对应的x坐标（id
     {
+
         temp =abs( rawDate[i + 1].y - rawDate[i].y);
-        if (temp < min)
+        diff.push_back(Point2f(rawDate[i+1].x, temp));//给第一个位置的差分赋0值
+        if (temp <= min)
         {
             min = temp; id = i;
         }
@@ -289,9 +317,9 @@ vector<Point2f> GetCurve::AutoGetCurve(Mat gray, bool isLinesptm) //图像校正
         }
     }
     cout <<id<<","<<linewidth << endl;
-    for (int i = 0; i < rawDate.size(); i++)//给原始数据加上线宽
+    for (int i = 1; i < rawDate.size(); i++)//给原始数据加上线宽
     {
-        rawDate[i].y = rawDate[i].y + linewidth / 2;
+        rawDate[i].y = rawDate[i].y-0.5 + 0.5*linewidth*sqrt((diff[i].x- diff[i-1].x) * (diff[i].x - diff[i - 1].x) +diff[i].y* diff[i].y)/ (diff[i].x - diff[i - 1].x);
     }
     return rawDate;
 }

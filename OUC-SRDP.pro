@@ -43,8 +43,10 @@ INCLUDEPATH += "D:\Program Files\opencv310\build\include"
 LIBS += "D:\Program Files\opencv310\opencv-build\lib\libopencv_*.a"
 
 DISTFILES += \
+    main.rc \
     qt/etc/qt.conf \
-    src/colorpicker.png
+    src/colorpicker.png \
+    uac.manifest
 
 RESOURCES += \
     image.qrc \

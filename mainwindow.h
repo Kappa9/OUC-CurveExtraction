@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QColor>
+#include <QDateTime>
 #include <QPainter>
 #include <QList>
 #include <QPoint>
@@ -88,5 +89,6 @@ private:
     void updateTable();
     void updateUndoButtons();
     void initColorPicker();
+    void outputData(QString fileName);
 };
 #endif // MAINWINDOW_H

@@ -72,6 +72,8 @@ void MainWindow::on_selectPicButton_clicked()
             tr("选择图片"),
             pic.filePath,
             tr("图片文件(*.png *jpg *jpeg *bmp)"));
+    QFileInfo fi = QFileInfo(fileName);
+    pic.filePath = fi.absolutePath();
     ui->picPathText->setText(fileName);
     changePic(fileName);
 }
@@ -85,11 +87,10 @@ void MainWindow::on_picPathText_returnPressed()
 void MainWindow::changePic(QString &fileName){
     Mat img_input = cv::imread(cv::String(fileName.toLocal8Bit().toStdString()));
     if(img_input.empty()){
-        QMessageBox::information(this,"错误","图片打开失败!");
+        QMessageBox::warning(this,"错误","图片打开失败!");
         if(!pic.originalPic.hasPic) setInputPicWidgetsState(false);
         return;
     }
-    pic.filePath = fileName;
     initInput();
     Mat temp;
     cv::cvtColor(img_input,temp,COLOR_BGR2RGB);
@@ -271,6 +272,9 @@ void MainWindow::on_coloredCurveCheckBox_stateChanged(int checked)
 void MainWindow::on_lineptmCheckBox_stateChanged(int checked)
 {
     pic.extractPic.lineptm = checked;
+    if(pic.extractPic.autoSelect){
+        on_autoChooseRadioButton_toggled(true);
+    }
 }
 
 void MainWindow::on_autoChooseRadioButton_toggled(bool checked)
@@ -401,15 +405,34 @@ void MainWindow::on_resetButton_clicked()
 
 void MainWindow::on_outputButton_clicked()
 {
+    //保存路径选择
+    QString filePath;
+    QString fileName = QDateTime().currentDateTime().toString("yyyyMMdd-hhmmss")+".csv";
+    filePath = QFileDialog::getSaveFileName(this,tr("导出数据"),pic.filePath+"\\"+fileName,".csv");
+    qDebug()<<filePath;
+    if(filePath.isEmpty()) {
+        return;
+    }
+    outputData(filePath);
+}
+
+
+void MainWindow::outputData(QString fileName)
+{
     //导出数据
     ofstream outp;
-    outp.open("./output2.csv", ios::out | ios::trunc);
+    outp.open(fileName.toStdString(), ios::out | ios::trunc);
+    //文件打开失败
+    if (outp.fail()){
+        QMessageBox::critical(this,"错误","数据导出失败!\n无写入权限，请更换路径到非系统分区!");
+        return;
+    }
     outp << "横坐标" << "," << "纵坐标" << "," << endl;
     for (QPointF p : pic.extractPic.getListF())
     {
         outp << p.x() << "," << p.y() << "," << endl;
     }
     outp.close();
-    qDebug()<<"Output succeed!";
-}
 
+    QMessageBox::information(this,"提示","数据导出成功!");
+}

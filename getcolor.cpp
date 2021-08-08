@@ -20,7 +20,6 @@ Mat Getcolor::GetPointColor(Mat src, Point2i pos)
     if (smin < 0) { smin = 0; }
     int vmin = v - 30;
     if (vmin < 0) { vmin = 0; }
-    //
     inRange(hsvp, Scalar(hmin, smin, vmin), Scalar(hmax, 255, 255), maskp);
     for (int r = 0; r < src.rows; r++)
     {
@@ -34,7 +33,7 @@ Mat Getcolor::GetPointColor(Mat src, Point2i pos)
             }
         }
     }
-    Mat kernelp = getStructuringElement(MORPH_RECT, Size(7, 7), Point(-1, -1));
-    morphologyEx(maskp, maskp, CV_MOP_CLOSE, kernelp);
+    //Mat kernelp = getStructuringElement(MORPH_RECT, Size(7, 7), Point(-1, -1));
+    //morphologyEx(maskp, maskp, CV_MOP_CLOSE, kernelp);
     return maskp;
 }
