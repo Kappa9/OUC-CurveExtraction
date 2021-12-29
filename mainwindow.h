@@ -71,6 +71,14 @@ private slots:
     void on_resetButton_clicked();
     void on_lineptmCheckBox_stateChanged(int checked);
 
+    void on_autoAdjustRadioButton_clicked(bool checked);
+
+    void on_manualAdjustRadioButton_clicked(bool checked);
+
+    void on_autoChooseRadioButton_clicked(bool checked);
+
+    void on_manualChooseRadioButton_clicked(bool checked);
+
 private:
     Ui::MainWindow *ui;
     Pic pic;

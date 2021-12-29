@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     flags |= Qt::WindowMinimizeButtonHint;
     flags |= Qt::WindowCloseButtonHint;
     setWindowFlags(flags);
+
     ui->xMinLineEdit->setValidator(new QDoubleValidator());
     ui->xMaxLineEdit->setValidator(new QDoubleValidator());
     ui->yMinLineEdit->setValidator(new QDoubleValidator());
@@ -132,27 +133,40 @@ void MainWindow::setExtractPicWidgetsState(bool state)
 void MainWindow::on_autoAdjustRadioButton_toggled(bool checked)
 {
     pic.inputPic.autoAdjust = checked;
+    if(!checked) {
+        pic.currentOriginalPic = &pic.originalPic;
+        ui->picLabel->setPixmap(pic.currentOriginalPic->pixmapToShow);
+    }
+
+}
+void MainWindow::on_autoAdjustRadioButton_clicked(bool checked){
     if(checked){
         //跟后端对接
-        pic.adjustedPic.mat = getCurve.AutoFix(pic.originalPic.mat);
-        pic.ConstructPicContent(pic.autoAdjustPic, pic.adjustedPic.mat, true);
-        pic.currentOriginalPic = &pic.autoAdjustPic;
-        ui->nextButton->setEnabled(true);
+        try {
+            pic.adjustedPic.mat = getCurve.AutoFix(pic.originalPic.mat);
+            pic.ConstructPicContent(pic.autoAdjustPic, pic.adjustedPic.mat, true);
+            pic.currentOriginalPic = &pic.autoAdjustPic;
+            ui->nextButton->setEnabled(true);
+            ui->picLabel->setPixmap(pic.currentOriginalPic->pixmapToShow);
+        }  catch (exception e) {
+            QMessageBox::critical(this,"错误","自动矫正失败!");
+        }
     }
-    else {
-        pic.currentOriginalPic = &pic.originalPic;
-    }
-    ui->picLabel->setPixmap(pic.currentOriginalPic->pixmapToShow);
 }
 
 void MainWindow::on_manualAdjustRadioButton_toggled(bool checked)
 {
     pic.inputPic.manualAdjust = checked;
     ui->picLabel->canDraw = checked;
-    ui->picLabel->update();
+    if(!checked)ui->picLabel->update();
+}
+
+void MainWindow::on_manualAdjustRadioButton_clicked(bool checked)
+{
     if(pic.inputPic.manualAdjust){
         initInput();
         QMessageBox::information(this,"提示","手动校正已启动!");
+        ui->picLabel->update();
     }
 }
 
@@ -281,6 +295,12 @@ void MainWindow::on_autoChooseRadioButton_toggled(bool checked)
 {
     pic.extractPic.autoSelect = checked;
     ui->picLabel_2->canDraw = checked;
+
+}
+
+
+void MainWindow::on_autoChooseRadioButton_clicked(bool checked)
+{
     on_resetButton_clicked();
     Mat temp;
     Mat threshold;
@@ -291,7 +311,13 @@ void MainWindow::on_autoChooseRadioButton_toggled(bool checked)
     else {
         threshold = pic.currentAdjustedPic->mat;
     }
-    vector<Point2f> viewpoints = getCurve.AutoGetCurve(threshold, pic.extractPic.lineptm);
+    vector<Point2f> viewpoints;
+    try {
+        viewpoints = getCurve.AutoGetCurve(threshold, pic.extractPic.lineptm);
+    }  catch (exception e) {
+        QMessageBox::critical(this,"错误","自动选点失败!");
+    }
+
     QList<QPointF> originalAxisList;
     QPointF relativeAxis;
     QPointF physicalAxis;
@@ -306,16 +332,23 @@ void MainWindow::on_autoChooseRadioButton_toggled(bool checked)
     updateUndoButtons();
 }
 
+
 void MainWindow::on_manualChooseRadioButton_toggled(bool checked)
 {
     pic.extractPic.manualSelect = checked;
     ui->picLabel_2->canDraw = checked;
-    on_resetButton_clicked();
-    //ui->picLabel_2->update();
+    //on_resetButton_clicked();
+}
+
+
+void MainWindow::on_manualChooseRadioButton_clicked(bool checked)
+{
     if(checked){
+        on_resetButton_clicked();
         QMessageBox::information(this,"提示","手动选取已启动!");
     }
 }
+
 
 void MainWindow::on_colorLabel_clicked()
 {
